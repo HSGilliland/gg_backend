@@ -1,0 +1,54 @@
+version: '3' 
+services:
+  # wso2-apim:
+  #   build: ./gg-docker-wso2/wso2-apim
+  #   healthcheck:
+  #     test: ["CMD", "nc", "-z","localhost", "9443"]
+  #     interval: 10s
+  #     start_period: 180s
+  #     retries: 20
+  #   # depends_on:
+  #   #   mysql:
+  #   #     condition: service_healthy
+  #   # volumes:
+  #   #   - ./conf/apim:/home/wso2carbon/wso2-config-volume
+  #   ports:
+  #     - "9443:9443"
+  #     - "8280:8280"
+  #     - "8243:8243"   
+  pg:     
+    build: ./gg-docker-postgres/     
+    env_file:       
+      - ./gg-docker-postgres/environment.env     
+    volumes:       
+      - C:\Users\Manie\development\persistent_Data\projects\gg\postgreSQL\data:/var/lib/postgresql/data
+      #- .\gg-docker-postgres\scripts\createtables.sh:/docker-entrypoint-initdb.d/
+    ports:     
+      - "9989:5432"
+    restart: 'always'
+    
+  # pgadmin:     
+  #   image: dpage/pgadmin4     
+  #   ports:       
+  #     - "4321:80"     
+  #   environment:       
+  #     - PGADMIN_DEFAULT_EMAIL=user@domain.com       
+  #     - PGADMIN_DEFAULT_PASSWORD=SuperSecret
+
+  crud:
+    build: ./gg-service-crud/
+    env_file:
+      - ./gg-service-crud/environment.env
+    ports:
+      - "9990:9990"
+    depends_on:
+      - pg
+
+  credentials:
+    build: ./gg-service-credentials/
+    env_file:
+      - ./gg-service-credentials/environment.env
+    ports:
+      - "9991:9991"
+    depends_on:
+      - crud

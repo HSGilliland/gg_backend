@@ -1,0 +1,8 @@
+FROM golang:alpine
+ADD /src/ /app/
+WORKDIR /app/
+RUN apk add --no-cache git &&\
+    go get "github.com/gorilla/mux"\
+        "github.com/lib/pq"
+RUN go build -o main .
+CMD ["/app/main"]
